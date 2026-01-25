@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página com Imagem</title>
+
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+    }
+
+    /* Imagem normal */
+    img.thumb {
+        max-width: 92vw;
+        max-height: 92vh;
+        object-fit: contain;
+        cursor: pointer;
+    }
+
+    /* Overlay */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+    .modal.ativo {
+        display: flex;
+    }
+
+    /* Card */
+    .card {
+        width: 90vw;
+        height: 90vh;
+        background: #111;
+        border-radius: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        overflow: auto; /* IMPORTANTE pro zoom */
+    }
+
+    /* Imagem do popup */
+    .card img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+
+        /* 🔥 permite pinça (zoom com dois dedos) */
+        touch-action: pinch-zoom;
+    }
+</style>
+</head>
+
+<body>
+
+<img src="end.jpg" alt="Imagem" class="thumb" id="abrir">
+
+<div class="modal" id="modal">
+    <div class="card">
+        <img src="end.jpg" alt="Imagem ampliada">
+    </div>
+</div>
+
+<script>
+    const abrir = document.getElementById("abrir");
+    const modal = document.getElementById("modal");
+
+    abrir.onclick = () => modal.classList.add("ativo");
+
+    // fecha clicando fora do card
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.classList.remove("ativo");
+        }
+    };
+</script>
+
+</body>
+</html>

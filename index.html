@@ -1,147 +1,171 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Personalidade 0</title>
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <title>Display Final - Correção Total</title>
+        <style>
+            * { box-sizing: border-box; }
 
-<style>
-    /* Reset básico */
-    * {
-        /* Remove o flash azul/cinza ao clicar no mobile */
-        -webkit-tap-highlight-color: transparent;
-        box-sizing: border-box;
-    }
+            body {
+                /* 1. REMOVE QUALQUER TRAÇO OU CURSOR */
+                cursor: none; 
+                user-select: none; /* Impede selecionar a imagem como texto */
+                caret-color: transparent; /* TORNAR O CURSOR INVISÍVEL */
+                
+                min-height: 100vh;
+                
+                /* CONFIGURAÇÃO DO FUNDO */
+                background-color: #000;
+                background-image: url('wew.jpg'); 
+                background-size: cover;      
+                background-position: center; 
+                background-repeat: no-repeat;
+                
+                /* MARGEM DE 50px */
+                margin: 50px;
+                
+                padding-top: 250px; 
+                padding-bottom: 50px; 
+                
+                /* MUDANÇA CRÍTICA: USAR FLEXBOX TIRA O CURSOR DE TEXTO */
+                display: flex; 
+                flex-direction: column;
+                align-items: center;
+                
+                font-family: 'Consolas', monospace;
+                overflow-y: auto; 
+                overflow-x: hidden;
+            }
 
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden; /* Impede scroll na página principal */
-        background: #000;
-        font-family: sans-serif;
-    }
+            .container {
+                position: relative;
+                /* Flex garante que não haja cursor aqui dentro */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 50px;
+            }
 
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+            #imagem-dinamica {
+                width: 400px;
+                height: 400px;
+                object-fit: cover;
+                
+                /* Visual */
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                border-radius: 15px;
+                box-shadow: 0 0 60px rgba(0,0,0,0.9);
+                
+                transition: opacity 0.5s ease;
+                opacity: 0;
+                z-index: 10;
+                /* Impede interação de clique/arrastar na imagem */
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
 
-    /* Regras gerais para imagens */
-    img {
-        /* Impede que a imagem seja selecionada ou arrastada */
-        -webkit-user-drag: none;
-        user-select: none;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-    }
-
-    /* Imagem da tela inicial (Thumbnail) */
-    img.thumb {
-        max-width: 92vw;
-        max-height: 92vh;
-        object-fit: contain;
-        cursor: pointer;
-        /* Evita zoom acidental com duplo clique, mas permite o clique normal */
-        touch-action: manipulation; 
-        transition: transform 0.1s ease;
-    }
-
-    img.thumb:active {
-        /* Efeito visual sutil de "apertar" */
-        transform: scale(0.98);
-    }
-
-    /* Overlay (Fundo escuro do modal) */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.95); /* Um pouco mais escuro para foco */
-        justify-content: center;
-        align-items: center;
-        z-index: 999;
-        /* Garante que o modal cubra tudo e anime suavemente se quiser */
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .modal.ativo {
-        display: flex;
-        opacity: 1;
-    }
-
-    /* O Container da Imagem Grande */
-    .card {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden; 
-    }
-
-    /* Imagem Ampliada dentro do Modal */
-    .card img {
-        max-width: 95vw;
-        max-height: 95vh;
-        object-fit: contain;
+        <div class="container">
+            <img id="imagem-dinamica" src="" alt="">
+        </div>
         
-        /* 🔥 Permite pinça (zoom com dois dedos) no mobile */
-        touch-action: pinch-zoom;
-        cursor: zoom-out;
-    }
-</style>
-</head>
+        <audio id="meu-som"></audio>
+        <audio id="musica-fundo" src="ebony.mp3" loop></audio>
 
-<body>
+        <script>
+            const imgElement = document.getElementById('imagem-dinamica');
+            const somElement = document.getElementById('meu-som');
+            const bgMusic = document.getElementById('musica-fundo');
 
-<audio id="musica-fundo" loop>
-    <source src="EBONY - Extraordinária (Clipe Oficial) - EBONY (youtube).mp3" type="audio/mpeg">
-</audio>
+            // Volume baixo (10%)
+            bgMusic.volume = 0.1; 
+            somElement.volume = 1.0; 
 
-<img src="Texto do seu parágrafo.jpg" alt="Toque para abrir" class="thumb" id="abrir">
+            const playlist = [
 
-<div class="modal" id="modal">
-    <div class="card">
-        <img src="te.jpg" alt="Imagem ampliada">
-    </div>
-</div>
 
-<script>
-    const abrir = document.getElementById("abrir");
-    const modal = document.getElementById("modal");
-    const audio = document.getElementById("musica-fundo");
 
-    // Tenta tocar assim que carrega (muitos navegadores bloqueiam isso)
-    window.onload = function() {
-        audio.volume = 0.5; // Começa com 50% do volume para não assustar
-        audio.play().catch(function(error) {
-            console.log("Autoplay bloqueado pelo navegador. Som iniciará no clique.");
-        });
-    };
+                { img: '5.png', som: '5.mp3' },
 
-    // Ação de abrir o modal
-    abrir.onclick = (e) => {
-        // Para a propagação para evitar conflitos de clique
-        e.stopPropagation();
-        
-        modal.classList.add("ativo");
-        
-        // Garante o play agora que houve interação do usuário
-        audio.play().catch(e => console.log(e)); 
-    };
 
-    // Ação de fechar o modal
-    modal.onclick = (e) => {
-        // Fecha se clicar fora da imagem ou na própria imagem (opcional)
-        // Se quiser fechar SÓ clicando fora, use: if (e.target === modal)
-        modal.classList.remove("ativo");
-    };
-</script>
 
-</body>
-</html> 
+                { img: 'patri.gif', som: 'patri.mp3' },
+
+
+
+                { img: '2.webp', som: '2.mp3' },
+
+
+
+                { img: 'joker.gif', som: 'joker.mp3' },
+
+
+
+                { img: '3.png', som: '3.mp3' },
+
+
+
+                { img: '4.png', som: '4.mp3' },
+
+
+
+                { img: 'do2.mp4,   gif', som: 'do2.mp3' },
+
+
+
+                { img: '1.jpg', som: 'pum.mp3' },
+
+
+
+                { img: 'Dog Gap Gif.gif', som: 'sil.mp3' }
+
+
+
+            ];;
+
+            let index = 0;
+
+            function rodarCiclo() {
+                imgElement.src = playlist[index].img;
+                somElement.src = playlist[index].som;
+
+                imgElement.style.opacity = 1;
+                somElement.play().catch(e => console.log("Som de efeito bloqueado (aguardando clique)"));
+
+                setTimeout(() => {
+                    imgElement.style.opacity = 0;
+                }, 3000);
+
+                index = (index + 1) % playlist.length;
+            }
+
+            // --- SOLUÇÃO DEFINITIVA PARA O SOM ---
+            // Cria uma função que destrava o som no PRIMEIRO clique em qualquer lugar
+            function destravaAudio() {
+                bgMusic.play().then(() => {
+                    // Se der play com sucesso, removemos os ouvintes (não precisa mais clicar)
+                    document.removeEventListener('click', destravaAudio);
+                    document.removeEventListener('keydown', destravaAudio);
+                }).catch(err => {
+                    console.log("Ainda bloqueado...");
+                });
+            }
+
+            // Adiciona o ouvinte IMEDIATAMENTE (não espera a página carregar)
+            document.addEventListener('click', destravaAudio);
+            document.addEventListener('keydown', destravaAudio);
+
+            window.onload = function() {
+                // Tenta dar play automático (vai funcionar se você veio de outra página)
+                bgMusic.play().catch(() => console.log("Autoplay nativo bloqueado. Clique na tela para iniciar."));
+
+                // Inicia o ciclo visual
+                setTimeout(() => {
+                    rodarCiclo();
+                    setInterval(rodarCiclo, 10000);
+                }, 7000);
+            };
+        </script>
+    </body>
+    </html>

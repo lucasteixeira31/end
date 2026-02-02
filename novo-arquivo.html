@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Display Final - Fundo Móvel</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            /* 1. FAZ A PÁGINA SER MAIOR QUE A TELA (150%) PARA TER COMO ROLAR */
+            min-height: 150vh;
+            
+            /* 2. CONFIGURAÇÃO DO FUNDO PARA ELE SE MEXER */
+            background-color: #000;
+            background-image: url('wew.jpg'); 
+            background-size: cover;       /* Cobre a largura */
+            background-position: center;  /* Centraliza */
+            background-repeat: no-repeat;
+            
+            /* IMPORTANTE: 'scroll' faz o fundo andar junto com a barra de rolagem */
+            background-attachment: scroll; 
+            
+            /* 3. EMPURRA A IMAGEM PARA BAIXO */
+            margin: 0;
+            padding-top: 250px; /* Começa 250px para baixo */
+            
+            display: block; 
+            text-align: center; /* Centraliza horizontalmente */
+            font-family: 'Consolas', monospace;
+        }
+
+        .container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 100px; /* Espaço extra no final */
+        }
+
+        #imagem-dinamica {
+            width: 400px;
+            height: 400px;
+            object-fit: cover;
+            
+            /* Visual */
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9); /* Sombra forte */
+            
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        #btn-play {
+            position: absolute;
+            z-index: 20;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: 1px solid #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        #btn-play:hover {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button id="btn-play">INICIAR</button>
+        <img id="imagem-dinamica" src="" alt="">
+    </div>
+    
+    <audio id="meu-som"></audio>
+    <audio id="musica-fundo" src="EBONY - Extraordinária (Clipe Oficial) - EBONY (youtube).mp3" loop></audio>
+
+    <script>
+        const imgElement = document.getElementById('imagem-dinamica');
+        const somElement = document.getElementById('meu-som');
+        const bgMusic = document.getElementById('musica-fundo');
+        const btnPlay = document.getElementById('btn-play');
+
+        bgMusic.volume = 0.8; 
+        somElement.volume = 1.0; 
+
+        const playlist = [
+            { img: '5.png', som: '5.mp3' },
+            { img: 'seu_gif_1.gif', som: '6.mp3' },
+            { img: '2.webp', som: '2.mp3' },
+            { img: 'seu_gif_2.gif', som: '7.mp3' },
+            { img: '3.png', som: '3.mp3' },
+            { img: '4.png', som: '4.mp3' },
+            { img: '1.jpg', som: '1.mp3' }
+        ];
+
+        let index = 0;
+
+        function rodarCiclo() {
+            imgElement.src = playlist[index].img;
+            somElement.src = playlist[index].som;
+
+            imgElement.style.opacity = 1;
+            somElement.play().catch(e => console.log("Erro de áudio"));
+
+            setTimeout(() => {
+                imgElement.style.opacity = 0;
+            }, 3000);
+
+            index = (index + 1) % playlist.length;
+        }
+
+        btnPlay.onclick = function() {
+            btnPlay.style.display = 'none';
+            bgMusic.play();
+
+            setTimeout(() => {
+                rodarCiclo();
+                setInterval(rodarCiclo, 10000);
+            }, 7000);
+        };
+    </script>
+</body>
+</html>

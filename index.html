@@ -6,65 +6,93 @@
 <title>Personalidade 0</title>
 
 <style>
+    /* Reset básico */
+    * {
+        /* Remove o flash azul/cinza ao clicar no mobile */
+        -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
+    }
+
     html, body {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow: hidden; /* Impede scroll na página principal */
+        background: #000;
+        font-family: sans-serif;
     }
 
     body {
         display: flex;
         justify-content: center;
         align-items: center;
-        background: #000;
     }
 
-    /* Imagem normal */
+    /* Regras gerais para imagens */
+    img {
+        /* Impede que a imagem seja selecionada ou arrastada */
+        -webkit-user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+
+    /* Imagem da tela inicial (Thumbnail) */
     img.thumb {
         max-width: 92vw;
         max-height: 92vh;
         object-fit: contain;
         cursor: pointer;
+        /* Evita zoom acidental com duplo clique, mas permite o clique normal */
+        touch-action: manipulation; 
+        transition: transform 0.1s ease;
     }
 
-    /* Overlay */
+    img.thumb:active {
+        /* Efeito visual sutil de "apertar" */
+        transform: scale(0.98);
+    }
+
+    /* Overlay (Fundo escuro do modal) */
     .modal {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0,0,0,0.95); /* Um pouco mais escuro para foco */
         justify-content: center;
         align-items: center;
         z-index: 999;
+        /* Garante que o modal cubra tudo e anime suavemente se quiser */
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
     .modal.ativo {
         display: flex;
+        opacity: 1;
     }
 
-    /* Card */
+    /* O Container da Imagem Grande */
     .card {
-        width: 90vw;
-        height: 90vh;
-        background: #111;
-        border-radius: 16px;
+        width: 100%;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 40px rgba(0,0,0,0.8);
-        overflow: auto; /* IMPORTANTE pro zoom */
+        overflow: hidden; 
     }
 
-    /* Imagem do popup */
+    /* Imagem Ampliada dentro do Modal */
     .card img {
-        max-width: 100%;
-        max-height: 100%;
+        max-width: 95vw;
+        max-height: 95vh;
         object-fit: contain;
-
-        /* 🔥 permite pinça (zoom com dois dedos) */
+        
+        /* 🔥 Permite pinça (zoom com dois dedos) no mobile */
         touch-action: pinch-zoom;
+        cursor: zoom-out;
     }
 </style>
 </head>
@@ -75,7 +103,7 @@
     <source src="EBONY - Extraordinária (Clipe Oficial) - EBONY (youtube).mp3" type="audio/mpeg">
 </audio>
 
-<img src="Texto do seu parágrafo.jpg" alt="Imagem" class="thumb" id="abrir">
+<img src="Texto do seu parágrafo.jpg" alt="Toque para abrir" class="thumb" id="abrir">
 
 <div class="modal" id="modal">
     <div class="card">
@@ -88,26 +116,32 @@
     const modal = document.getElementById("modal");
     const audio = document.getElementById("musica-fundo");
 
-    // Tenta tocar assim que carrega
+    // Tenta tocar assim que carrega (muitos navegadores bloqueiam isso)
     window.onload = function() {
+        audio.volume = 0.5; // Começa com 50% do volume para não assustar
         audio.play().catch(function(error) {
-            console.log("O navegador bloqueou o autoplay. O som iniciará no primeiro clique.");
+            console.log("Autoplay bloqueado pelo navegador. Som iniciará no clique.");
         });
     };
 
-    abrir.onclick = () => {
+    // Ação de abrir o modal
+    abrir.onclick = (e) => {
+        // Para a propagação para evitar conflitos de clique
+        e.stopPropagation();
+        
         modal.classList.add("ativo");
-        // Garante o play caso o navegador tenha bloqueado o inicio automático
-        audio.play(); 
+        
+        // Garante o play agora que houve interação do usuário
+        audio.play().catch(e => console.log(e)); 
     };
 
-    // fecha clicando fora do card
+    // Ação de fechar o modal
     modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.classList.remove("ativo");
-        }
+        // Fecha se clicar fora da imagem ou na própria imagem (opcional)
+        // Se quiser fechar SÓ clicando fora, use: if (e.target === modal)
+        modal.classList.remove("ativo");
     };
 </script>
 
 </body>
-</html>
+</html> 

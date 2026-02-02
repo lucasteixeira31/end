@@ -1,171 +1,156 @@
-    <!DOCTYPE html>
-    <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <title>Display Final - Correção Total</title>
-        <style>
-            * { box-sizing: border-box; }
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Display Final - Sincronizado</title>
+    <style>
+        * { box-sizing: border-box; }
 
-            body {
-                /* 1. REMOVE QUALQUER TRAÇO OU CURSOR */
-                cursor: none; 
-                user-select: none; /* Impede selecionar a imagem como texto */
-                caret-color: transparent; /* TORNAR O CURSOR INVISÍVEL */
-                
-                min-height: 100vh;
-                
-                /* CONFIGURAÇÃO DO FUNDO */
-                background-color: #000;
-                background-image: url('wew.jpg'); 
-                background-size: cover;      
-                background-position: center; 
-                background-repeat: no-repeat;
-                
-                /* MARGEM DE 50px */
-                margin: 50px;
-                
-                padding-top: 250px; 
-                padding-bottom: 50px; 
-                
-                /* MUDANÇA CRÍTICA: USAR FLEXBOX TIRA O CURSOR DE TEXTO */
-                display: flex; 
-                flex-direction: column;
-                align-items: center;
-                
-                font-family: 'Consolas', monospace;
-                overflow-y: auto; 
-                overflow-x: hidden;
+        body {
+            /* 1. REMOVE QUALQUER TRAÇO OU CURSOR */
+            cursor: none; 
+            user-select: none;
+            caret-color: transparent;
+            
+            min-height: 100vh;
+            
+            /* CONFIGURAÇÃO DO FUNDO */
+            background-color: #000;
+            background-image: url('wew.jpg'); 
+            background-size: cover;      
+            background-position: center; 
+            background-repeat: no-repeat;
+            
+            /* MARGEM DE 50px */
+            margin: 50px;
+            
+            padding-top: 250px; 
+            padding-bottom: 50px; 
+            
+            /* USAR FLEXBOX TIRA O CURSOR DE TEXTO */
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            
+            font-family: 'Consolas', monospace;
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        #imagem-dinamica {
+            width: 400px;
+            height: 400px;
+            object-fit: cover;
+            
+            /* Visual */
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img id="imagem-dinamica" src="" alt="">
+    </div>
+    
+    <audio id="meu-som"></audio>
+    <audio id="musica-fundo" src="ebony.mp3" loop></audio>
+
+    <script>
+        const imgElement = document.getElementById('imagem-dinamica');
+        const somElement = document.getElementById('meu-som');
+        const bgMusic = document.getElementById('musica-fundo');
+
+        // Volume
+        bgMusic.volume = 0.1; 
+        somElement.volume = 1.0; 
+
+        const playlist = [
+            { img: '5.png', som: '5.mp3' },
+            { img: 'patri.gif', som: 'patri.mp3' },
+            { img: '2.webp', som: '2.mp3' },
+            { img: 'joker.gif', som: 'joker.mp3' },
+            { img: '3.png', som: '3.mp3' },
+            { img: '4.png', som: '4.mp3' },
+            { img: 'do2.gif', som: 'do2.mp3' },
+            { img: '1.jpg', som: 'pum.mp3' },
+            { img: 'Dog Gap Gif.gif', som: 'sil.mp3' }
+        ];
+
+        let index = 0;
+
+        function rodarCiclo() {
+            // Define a imagem e o som atuais
+            imgElement.src = playlist[index].img;
+            somElement.src = playlist[index].som;
+
+            // Mostra a imagem
+            imgElement.style.opacity = 1;
+            
+            // Toca o som
+            somElement.play().catch(e => console.log("Som aguardando clique"));
+
+            // Verifica agora se é o último item (para usar dentro do timeout)
+            let ehUltimo = (index === playlist.length - 1);
+
+            // --- CORTE SINCRONIZADO: 5 SEGUNDOS ---
+            setTimeout(() => {
+                // 1. Some a imagem
+                imgElement.style.opacity = 0;
+
+                // 2. PAUSA O SOM EXATAMENTE AGORA (Corte Seco)
+                somElement.pause();
+                somElement.currentTime = 0; // Reseta o áudio para o início
+
+                // 3. Se for o último, redireciona agora mesmo
+                if (ehUltimo) {
+                    window.location.href = "fim.html";
+                }
+            }, 5000);
+
+            // --- AGENDA O PRÓXIMO CICLO (10 SEGUNDOS) ---
+            // Se NÃO for o último, prepara o próximo loop para daqui a 10s
+            if (!ehUltimo) {
+                setTimeout(rodarCiclo, 10000);
             }
 
-            .container {
-                position: relative;
-                /* Flex garante que não haja cursor aqui dentro */
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-bottom: 50px;
-            }
+            // Atualiza o índice para a próxima rodada
+            index = (index + 1) % playlist.length;
+        }
 
-            #imagem-dinamica {
-                width: 400px;
-                height: 400px;
-                object-fit: cover;
-                
-                /* Visual */
-                border: 2px solid rgba(255, 255, 255, 0.5);
-                border-radius: 15px;
-                box-shadow: 0 0 60px rgba(0,0,0,0.9);
-                
-                transition: opacity 0.5s ease;
-                opacity: 0;
-                z-index: 10;
-                /* Impede interação de clique/arrastar na imagem */
-                pointer-events: none;
-            }
-        </style>
-    </head>
-    <body>
+        function destravaAudio() {
+            bgMusic.play().then(() => {
+                document.removeEventListener('click', destravaAudio);
+                document.removeEventListener('keydown', destravaAudio);
+            }).catch(err => console.log("Bloqueado"));
+        }
 
-        <div class="container">
-            <img id="imagem-dinamica" src="" alt="">
-        </div>
-        
-        <audio id="meu-som"></audio>
-        <audio id="musica-fundo" src="ebony.mp3" loop></audio>
+        document.addEventListener('click', destravaAudio);
+        document.addEventListener('keydown', destravaAudio);
 
-        <script>
-            const imgElement = document.getElementById('imagem-dinamica');
-            const somElement = document.getElementById('meu-som');
-            const bgMusic = document.getElementById('musica-fundo');
+        window.onload = function() {
+            bgMusic.play().catch(() => console.log("Autoplay bloqueado"));
 
-            // Volume baixo (10%)
-            bgMusic.volume = 0.1; 
-            somElement.volume = 1.0; 
-
-            const playlist = [
-
-
-
-                { img: '5.png', som: '5.mp3' },
-
-
-
-                { img: 'patri.gif', som: 'patri.mp3' },
-
-
-
-                { img: '2.webp', som: '2.mp3' },
-
-
-
-                { img: 'joker.gif', som: 'joker.mp3' },
-
-
-
-                { img: '3.png', som: '3.mp3' },
-
-
-
-                { img: '4.png', som: '4.mp3' },
-
-
-
-                { img: 'do2.mp4,   gif', som: 'do2.mp3' },
-
-
-
-                { img: '1.jpg', som: 'pum.mp3' },
-
-
-
-                { img: 'Dog Gap Gif.gif', som: 'sil.mp3' }
-
-
-
-            ];;
-
-            let index = 0;
-
-            function rodarCiclo() {
-                imgElement.src = playlist[index].img;
-                somElement.src = playlist[index].som;
-
-                imgElement.style.opacity = 1;
-                somElement.play().catch(e => console.log("Som de efeito bloqueado (aguardando clique)"));
-
-                setTimeout(() => {
-                    imgElement.style.opacity = 0;
-                }, 3000);
-
-                index = (index + 1) % playlist.length;
-            }
-
-            // --- SOLUÇÃO DEFINITIVA PARA O SOM ---
-            // Cria uma função que destrava o som no PRIMEIRO clique em qualquer lugar
-            function destravaAudio() {
-                bgMusic.play().then(() => {
-                    // Se der play com sucesso, removemos os ouvintes (não precisa mais clicar)
-                    document.removeEventListener('click', destravaAudio);
-                    document.removeEventListener('keydown', destravaAudio);
-                }).catch(err => {
-                    console.log("Ainda bloqueado...");
-                });
-            }
-
-            // Adiciona o ouvinte IMEDIATAMENTE (não espera a página carregar)
-            document.addEventListener('click', destravaAudio);
-            document.addEventListener('keydown', destravaAudio);
-
-            window.onload = function() {
-                // Tenta dar play automático (vai funcionar se você veio de outra página)
-                bgMusic.play().catch(() => console.log("Autoplay nativo bloqueado. Clique na tela para iniciar."));
-
-                // Inicia o ciclo visual
-                setTimeout(() => {
-                    rodarCiclo();
-                    setInterval(rodarCiclo, 10000);
-                }, 7000);
-            };
-        </script>
-    </body>
-    </html>
+            // O primeiro inicia aos 7 segundos
+            setTimeout(() => {
+                rodarCiclo();
+            }, 7000);
+        };
+    </script>
+</body>
+</html>

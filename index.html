@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Página com Imagem</title>
+<title>Personalidade 0</title>
 
 <style>
     html, body {
@@ -71,19 +71,35 @@
 
 <body>
 
-<img src="end.jpg" alt="Imagem" class="thumb" id="abrir">
+<audio id="musica-fundo" loop>
+    <source src="EBONY - Extraordinária (Clipe Oficial) - EBONY (youtube).mp3" type="audio/mpeg">
+</audio>
+
+<img src="Texto do seu parágrafo.jpg" alt="Imagem" class="thumb" id="abrir">
 
 <div class="modal" id="modal">
     <div class="card">
-        <img src="end.jpg" alt="Imagem ampliada">
+        <img src="te.jpg" alt="Imagem ampliada">
     </div>
 </div>
 
 <script>
     const abrir = document.getElementById("abrir");
     const modal = document.getElementById("modal");
+    const audio = document.getElementById("musica-fundo");
 
-    abrir.onclick = () => modal.classList.add("ativo");
+    // Tenta tocar assim que carrega
+    window.onload = function() {
+        audio.play().catch(function(error) {
+            console.log("O navegador bloqueou o autoplay. O som iniciará no primeiro clique.");
+        });
+    };
+
+    abrir.onclick = () => {
+        modal.classList.add("ativo");
+        // Garante o play caso o navegador tenha bloqueado o inicio automático
+        audio.play(); 
+    };
 
     // fecha clicando fora do card
     modal.onclick = (e) => {

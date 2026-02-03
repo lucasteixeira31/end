@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Responsivo com Espaçamento Proporcional</title>
+    <style>
+        /* Reset básico para garantir consistência */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Variáveis CSS para facilitar manutenção */
+        :root {
+            /* Espaçamento vertical proporcional (simula ~15cm visuais) */
+            --spacing-vertical: clamp(8vh, 12vh, 15vh);
+            
+            /* Cor de fundo para visualizar melhor o layout */
+            --bg-color: #f0f0f0;
+            --container-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Body configurado para ocupar toda a viewport */
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
+            /* Flexbox para centralizar o container verticalmente */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: stretch;
+            
+            /* Remove overflow horizontal indesejado */
+            overflow-x: hidden;
+        }
+
+        /* Container principal - a estrela do layout */
+        .main-container {
+            /* Largura sempre 100% da viewport, encostando nas laterais */
+            width: 100vw;
+            
+            /* Altura mínima baseada na viewport, crescendo conforme necessário */
+            min-height: calc(100vh - 2 * var(--spacing-vertical));
+            
+            /* Espaçamento vertical proporcional (topo e rodapé) */
+            margin-top: var(--spacing-vertical);
+            margin-bottom: var(--spacing-vertical);
+            
+            /* Estilo visual do container */
+            background-color: var(--container-bg);
+            box-shadow: 0 4px 20px var(--shadow-color);
+            
+            /* Flexbox para centralizar conteúdo interno */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Permite que o container cresça verticalmente se necessário */
+            flex-grow: 1;
+            
+            /* Padding interno para conteúdo não encostar nas bordas */
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        /* Container da imagem - mantém proporção perfeita */
+        .image-container {
+            /* Ocupa o máximo possível do container pai */
+            width: 100%;
+            max-width: 100%;
+            
+            /* Altura flexível baseada no conteúdo */
+            height: auto;
+            min-height: 50vh;
+            
+            /* Flexbox para centralizar a imagem */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Borda sutil para delimitar a área da imagem */
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+        }
+
+        /* Imagem responsiva com proporção perfeita */
+        .responsive-image {
+            /* Dimensões máximas respeitando o container */
+            max-width: 100%;
+            max-height: 100%;
+            
+            /* Altura automática para manter proporção */
+            height: auto;
+            
+            /* object-fit: contain garante que a imagem não distorça */
+            object-fit: contain;
+            
+            /* Transição suave para mudanças de tamanho */
+            transition: all 0.3s ease;
+            
+            /* Borda arredondada para visual moderno */
+            border-radius: 4px;
+        }
+
+        /* Texto de demonstração */
+        .demo-text {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 300px;
+            z-index: 10;
+        }
+
+        /* Media queries automáticas - o layout se adapta sozinho */
+        
+        /* Telas muito pequenas (celulares em portrait) */
+        @media (max-width: 480px) {
+            :root {
+                /* Reduz espaçamento em telas pequenas */
+                --spacing-vertical: clamp(5vh, 8vh, 10vh);
+            }
+            
+            .main-container {
+                /* Padding menor em telas pequenas */
+                padding: clamp(0.5rem, 2vw, 1rem);
+            }
+        }
+
+        /* Telas médias (tablets) */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            :root {
+                /* Espaçamento ideal para tablets */
+                --spacing-vertical: clamp(10vh, 12vh, 14vh);
+            }
+        }
+
+        /* Telas grandes (desktops) */
+        @media (min-width: 1200px) {
+            :root {
+                /* Espaçamento máximo para telas grandes */
+                --spacing-vertical: clamp(12vh, 15vh, 18vh);
+            }
+            
+            .main-container {
+                /* Padding maior em telas grandes */
+                padding: clamp(2rem, 4vw, 3rem);
+            }
+        }
+
+        /* Orientação landscape - ajustes específicos */
+        @media (orientation: landscape) and (max-height: 600px) {
+            :root {
+                /* Reduz espaçamento vertical em landscape baixo */
+                --spacing-vertical: clamp(3vh, 6vh, 8vh);
+            }
+        }
+
+        /* Modo escuro (opcional) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --container-bg: #2d2d2d;
+                --shadow-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .image-container {
+                border-color: #555;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Texto explicativo (removível em produção) -->
+    <div class="demo-text">
+        <strong>Layout Responsivo</strong><br>
+        • Container: 100vw (encosta nas laterais)<br>
+        • Espaçamento: ~15cm visuais (vh/clamp)<br>
+        • Altura: cresce com viewport<br>
+        • Imagem: proporção perfeita<br>
+        • Responsivo: todas as telas
+    </div>
+
+    <!-- Container principal - coração do layout -->
+    <main class="main-container">
+        <!-- Container da imagem com proporção perfeita -->
+        <div class="image-container">
+            <!-- Imagem responsiva (substitua src pela sua imagem) -->
+            <img 
+                src="wew.jpg" 
+                alt="Imagem responsiva de demonstração" 
+                class="responsive-image"
+            >
+        </div>
+    </main>
+</body>
+</html>

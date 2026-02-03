@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Display Fullscreen Fixo (Sem Zoom)</title>
+    <style>
+        :root {
+            /* === PC (Tela Grande) === */
+            --spacing-vertical: 13vh; 
+            --media-size: 20vmin; 
+            --back-btn-size: 3vw;
+            --back-btn-font: 1.5vw;
+        }
+
+        /* === CELULAR (Tela Pequena) === */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-vertical: 2vh; 
+                --media-size: 80vmin; 
+                --back-btn-size: 12vw;
+                --back-btn-font: 6vw;
+            }
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #000;
+            font-family: 'Segoe UI', Consolas, sans-serif;
+            overflow: hidden;
+            touch-action: none; 
+        }
+
+        .container-imagem {
+            position: fixed;
+            top: var(--spacing-vertical);
+            bottom: var(--spacing-vertical);
+            left: var(--spacing-vertical);
+            right: var(--spacing-vertical);
+            width: calc(100vw - 2 * var(--spacing-vertical));
+            height: calc(100vh - 2 * var(--spacing-vertical));
+            box-sizing: border-box;
+            background-color: #1a1a1a;
+            padding: 0;
+            border-radius: 2vw;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.5s ease-out; 
+        }
+
+        .background-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; 
+            height: 100%;
+            background-image: url('wew.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: contain; 
+            opacity: 0.8;
+            z-index: 0;
+            transition: all 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .background-image {
+                opacity: 0.6; 
+            }
+        }
+
+        #imagem-dinamica {
+            width: var(--media-size);
+            height: var(--media-size);
+            
+            /* Garante que a imagem caiba no container */
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain;
+
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            border-radius: 1vw;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            z-index: 10;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+        }
+
+        .botao-voltar {
+            position: fixed;
+            top: 3vh;
+            left: 3vh;
+            width: var(--back-btn-size);
+            height: var(--back-btn-size);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.9);
+            font-size: var(--back-btn-font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            z-index: 30;
+        }
+
+        .play-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.5vw;
+            font-size: 2vmin; 
+            padding: 1.5vmin 4vmin;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+            transition: all 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .play-button {
+                font-size: 4vw;
+                padding: 3vw 8vw;
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        .play-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            letter-spacing: 0.7vw;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .play-button.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        
+        #controls-info { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container-imagem">
+        <div class="background-image"></div>
+        <img id="imagem-dinamica" src="" alt="">
+        <a href="#" class="botao-voltar">←</a>
+    </div>
+
+    <button class="play-button" id="playButton">iniciar</button>
+
+    <audio id="meu-som"></audio>
+    <audio id="musica-fundo" src="ebony.mp3"></audio>
+
+    <script>
+        const imgElement = document.getElementById('imagem-dinamica');
+        const somElement = document.getElementById('meu-som');
+        const bgMusic = document.getElementById('musica-fundo');
+        const playButton = document.getElementById('playButton');
+        const container = document.querySelector('.container-imagem');
+
+        bgMusic.volume = 0.3;
+        somElement.volume = 1.0;
+
+        const duracaoGif = 5000; 
+
+        // Playlist
+        const playlist = [
+            { img: '5.png', som: '5.mp3' },
+            { img: 'patri.gif', som: 'patri.mp3' },
+            { img: '2.webp', som: '2.mp3' },
+            { img: 'joker.gif', som: 'joker.mp3' },
+            { img: '3.png', som: '3.mp3' },
+            { img: '4.png', som: '4.mp3' },
+            { img: '1.jpg', som: '1.mp3' },
+            { img: 'qww.gif', som: 'sil.mp3' }
+        ];
+
+        let index = 0;
+        let intervaloId; 
+
+        function rodarCiclo() {
+            if (index >= playlist.length) return;
+
+            imgElement.src = playlist[index].img;
+            somElement.src = playlist[index].som;
+            imgElement.style.opacity = 1;
+            somElement.play().catch(e => console.log("Erro play som fx"));
+
+            setTimeout(() => {
+                imgElement.style.opacity = 0;
+                somElement.pause();
+                somElement.currentTime = 0;
+            }, duracaoGif);
+
+            index++;
+
+            if (index >= playlist.length) {
+                clearInterval(intervaloId);
+                setTimeout(() => {
+                    window.location.href = "fim.html";
+                }, duracaoGif + 500);
+            }
+        }
+
+        function iniciarExperiencia() {
+            playButton.classList.add('hidden');
+            
+            bgMusic.play().then(() => {
+                console.log("Música iniciada");
+            }).catch(() => {
+                console.log("Erro ao iniciar música");
+            });
+
+            setTimeout(() => {
+                rodarCiclo();
+                intervaloId = setInterval(rodarCiclo, 10000);
+            }, 1000);
+        }
+
+        playButton.addEventListener('click', iniciarExperiencia);
+        
+        // Nenhuma lógica de zoom ou arraste restante no Script.
+    </script>
+</body>
+</html>

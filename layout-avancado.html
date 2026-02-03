@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Avançado - Múltiplos Containers</title>
+    <style>
+        /* Reset e configurações base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Variáveis CSS centralizadas */
+        :root {
+            /* Espaçamento vertical inteligente */
+            --spacing-top: clamp(8vh, 12vh, 15vh);
+            --spacing-bottom: clamp(8vh, 12vh, 15vh);
+            
+            /* Cores do tema */
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --container-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #333;
+            --border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Body como container flex principal */
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            background: var(--bg-gradient);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            
+            /* Layout flex vertical */
+            display: flex;
+            flex-direction: column;
+            
+            /* Remove scroll horizontal */
+            overflow-x: hidden;
+        }
+
+        /* Espaçador superior - cresce automaticamente */
+        .spacer-top {
+            height: var(--spacing-top);
+            flex-shrink: 0;
+        }
+
+        /* Espaçador inferior - cresce automaticamente */
+        .spacer-bottom {
+            height: var(--spacing-bottom);
+            flex-shrink: 0;
+        }
+
+        /* Container principal flexível */
+        .main-content {
+            /* Largura total da viewport */
+            width: 100vw;
+            
+            /* Cresce para preencher espaço disponível */
+            flex-grow: 1;
+            
+            /* Layout interno em coluna */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            
+            /* Padding interno responsivo */
+            padding: clamp(1rem, 3vw, 2rem);
+        }
+
+        /* Container de conteúdo individual */
+        .content-container {
+            /* Fundo translúcido moderno */
+            background: var(--container-bg);
+            backdrop-filter: blur(10px);
+            
+            /* Bordas e sombras elegantes */
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            
+            /* Padding interno responsivo */
+            padding: clamp(1.5rem, 4vw, 3rem);
+            
+            /* Altura mínima baseada na viewport */
+            min-height: clamp(200px, 30vh, 400px);
+            
+            /* Flexbox para centralizar conteúdo */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            
+            /* Transição suave */
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect nos containers */
+        .content-container:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Container específico para imagens */
+        .image-container {
+            /* Altura flexível para imagens */
+            min-height: clamp(300px, 50vh, 600px);
+            
+            /* Remove padding para imagens ocuparem mais espaço */
+            padding: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        /* Imagem responsiva perfeita */
+        .responsive-image {
+            /* Dimensões máximas do container pai */
+            max-width: 100%;
+            max-height: 100%;
+            
+            /* Altura automática para manter proporção */
+            height: auto;
+            
+            /* object-fit: contain = sem distorção */
+            object-fit: contain;
+            
+            /* Bordas arredondadas */
+            border-radius: 12px;
+            
+            /* Sombra sutil */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            
+            /* Transição suave para interações */
+            transition: all 0.3s ease;
+        }
+
+        /* Títulos responsivos */
+        .title {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Texto responsivo */
+        .description {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            line-height: 1.6;
+            text-align: center;
+            opacity: 0.8;
+            max-width: 600px;
+        }
+
+        /* Indicador de responsividade */
+        .responsive-indicator {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            font-family: monospace;
+        }
+
+        /* Media Queries Inteligentes */
+        
+        /* Celulares pequenos */
+        @media (max-width: 480px) {
+            :root {
+                --spacing-top: clamp(4vh, 6vh, 8vh);
+                --spacing-bottom: clamp(4vh, 6vh, 8vh);
+            }
+            
+            .main-content {
+                gap: 1rem;
+                padding: clamp(0.5rem, 2vw, 1rem);
+            }
+        }
+
+        /* Tablets */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            :root {
+                --spacing-top: clamp(10vh, 14vh, 16vh);
+                --spacing-bottom: clamp(10vh, 14vh, 16vh);
+            }
+        }
+
+        /* Desktops grandes */
+        @media (min-width: 1200px) {
+            :root {
+                --spacing-top: clamp(12vh, 16vh, 20vh);
+                --spacing-bottom: clamp(12vh, 16vh, 20vh);
+            }
+            
+            .main-content {
+                padding: clamp(2rem, 5vw, 4rem);
+            }
+        }
+
+        /* Landscape em telas baixas */
+        @media (orientation: landscape) and (max-height: 600px) {
+            :root {
+                --spacing-top: clamp(2vh, 4vh, 6vh);
+                --spacing-bottom: clamp(2vh, 4vh, 6vh);
+            }
+        }
+
+        /* Telas ultra-wide */
+        @media (min-width: 1920px) {
+            .main-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Indicador de responsividade -->
+    <div class="responsive-indicator" id="sizeIndicator">
+        Carregando...
+    </div>
+
+    <!-- Espaçador superior automático -->
+    <div class="spacer-top"></div>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+        <!-- Container de título -->
+        <section class="content-container">
+            <h1 class="title">Layout Responsivo Perfeito</h1>
+            <p class="description">
+                Este layout mantém espaçamento proporcional de ~15cm visuais, 
+                cresce automaticamente quando toca as laterais, e preserva 
+                proporções perfeitas em qualquer tela.
+            </p>
+        </section>
+
+        <!-- Container de imagem -->
+        <section class="content-container image-container">
+            <img 
+                src="wew.jpg" 
+                alt="Imagem de demonstração" 
+                class="responsive-image"
+            >
+        </section>
+
+        <!-- Container de informações técnicas -->
+        <section class="content-container">
+            <h2 class="title" style="font-size: clamp(1.2rem, 3vw, 1.8rem);">
+                Características Técnicas
+            </h2>
+            <div class="description">
+                <strong>✓ Container:</strong> 100vw (encosta nas laterais)<br>
+                <strong>✓ Espaçamento:</strong> clamp(8vh, 12vh, 15vh)<br>
+                <strong>✓ Altura:</strong> min-height baseado em viewport<br>
+                <strong>✓ Imagem:</strong> object-fit: contain (sem distorção)<br>
+                <strong>✓ Responsivo:</strong> funciona em todas as telas<br>
+                <strong>✓ Moderno:</strong> CSS Grid + Flexbox + clamp()
+            </div>
+        </section>
+    </main>
+
+    <!-- Espaçador inferior automático -->
+    <div class="spacer-bottom"></div>
+
+    <script>
+        // Indicador de tamanho da tela (para demonstração)
+        function updateSizeIndicator() {
+            const indicator = document.getElementById('sizeIndicator');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            let deviceType = '';
+            if (width < 480) deviceType = 'Mobile S';
+            else if (width < 768) deviceType = 'Mobile L';
+            else if (width < 1024) deviceType = 'Tablet';
+            else if (width < 1200) deviceType = 'Desktop';
+            else deviceType = 'Desktop L';
+            
+            indicator.textContent = `${deviceType} | ${width}×${height}px`;
+        }
+
+        // Atualiza indicador ao carregar e redimensionar
+        window.addEventListener('load', updateSizeIndicator);
+        window.addEventListener('resize', updateSizeIndicator);
+    </script>
+</body>
+</html>

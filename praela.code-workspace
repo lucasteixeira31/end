@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "praela",
+			"path": "../../../praela"
+		}
+	],
+	"settings": {
+		"kiroAgent.configureMCP": "Disabled",
+		"liveServer.settings.port": 5501
+	}
+}

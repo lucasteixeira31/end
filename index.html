@@ -1,156 +1,360 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Display Final - Sincronizado</title>
-    <style>
-        * { box-sizing: border-box; }
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Display Fullscreen Fixo</title>
+        <style>
+            :root {
+                /* Espaçamento vertical proporcional - simula ~15cm visuais */
+                --spacing-vertical: clamp(8vh, 12vh, 15vh);
+                
+                /* Tamanho dos elementos internos (GIF) - responsivo */
+                --media-size: 20vmin; 
 
-        body {
-            /* 1. REMOVE QUALQUER TRAÇO OU CURSOR */
-            cursor: none; 
-            user-select: none;
-            caret-color: transparent;
-            
-            min-height: 100vh;
-            
-            /* CONFIGURAÇÃO DO FUNDO */
-            background-color: #000;
-            background-image: url('wew.jpg'); 
-            background-size: cover;      
-            background-position: center; 
-            background-repeat: no-repeat;
-            
-            /* MARGEM DE 50px */
-            margin: 50px;
-            
-            padding-top: 250px; 
-            padding-bottom: 50px; 
-            
-            /* USAR FLEXBOX TIRA O CURSOR DE TEXTO */
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            
-            font-family: 'Consolas', monospace;
-            overflow-y: auto; 
-            overflow-x: hidden;
-        }
-
-        .container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
-        }
-
-        #imagem-dinamica {
-            width: 400px;
-            height: 400px;
-            object-fit: cover;
-            
-            /* Visual */
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 15px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.9);
-            
-            transition: opacity 0.5s ease;
-            opacity: 0;
-            z-index: 10;
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <img id="imagem-dinamica" src="" alt="">
-    </div>
-    
-    <audio id="meu-som"></audio>
-    <audio id="musica-fundo" src="ebony.mp3" loop></audio>
-
-    <script>
-        const imgElement = document.getElementById('imagem-dinamica');
-        const somElement = document.getElementById('meu-som');
-        const bgMusic = document.getElementById('musica-fundo');
-
-        // Volume
-        bgMusic.volume = 0.1; 
-        somElement.volume = 1.0; 
-
-        const playlist = [
-            { img: '5.png', som: '5.mp3' },
-            { img: 'patri.gif', som: 'patri.mp3' },
-            { img: '2.webp', som: '2.mp3' },
-            { img: 'joker.gif', som: 'joker.mp3' },
-            { img: '3.png', som: '3.mp3' },
-            { img: '4.png', som: '4.mp3' },
-            { img: 'do2.gif', som: 'do2.mp3' },
-            { img: '1.jpg', som: 'pum.mp3' },
-            { img: 'as.gif', som: 'sil.mp3' }
-        ];
-
-        let index = 0;
-
-        function rodarCiclo() {
-            // Define a imagem e o som atuais
-            imgElement.src = playlist[index].img;
-            somElement.src = playlist[index].som;
-
-            // Mostra a imagem
-            imgElement.style.opacity = 1;
-            
-            // Toca o som
-            somElement.play().catch(e => console.log("Som aguardando clique"));
-
-            // Verifica agora se é o último item (para usar dentro do timeout)
-            let ehUltimo = (index === playlist.length - 1);
-
-            // --- CORTE SINCRONIZADO: 5 SEGUNDOS ---
-            setTimeout(() => {
-                // 1. Some a imagem
-                imgElement.style.opacity = 0;
-
-                // 2. PAUSA O SOM EXATAMENTE AGORA (Corte Seco)
-                somElement.pause();
-                somElement.currentTime = 0; // Reseta o áudio para o início
-
-                // 3. Se for o último, redireciona agora mesmo
-                if (ehUltimo) {
-                    window.location.href = "fim.html";
-                }
-            }, 5000);
-
-            // --- AGENDA O PRÓXIMO CICLO (10 SEGUNDOS) ---
-            // Se NÃO for o último, prepara o próximo loop para daqui a 10s
-            if (!ehUltimo) {
-                setTimeout(rodarCiclo, 10000);
+                /* Tamanho do botão proporcional */
+                --back-btn-size: 3vw;
+                --back-btn-font: 1.5vw;
             }
 
-            // Atualiza o índice para a próxima rodada
-            index = (index + 1) % playlist.length;
-        }
+            /* Ajuste para celular */
+            @media (max-width: 768px) {
+                :root {
+                    /* GIF bem grande e visível em tela pequena */
+                    --media-size: 35vmin; 
+                    
+                    /* Botões maiores para touch friendly */
+                    --back-btn-size: 6vw;
+                    --back-btn-font: 3vw;
+                    
+                    /* Bordas bem finas para maximizar espaço da imagem */
+                    --spacing-vertical: clamp(2vh, 4vh, 6vh);
+                }
+                
+                /* Botão PLAY maior para celular */
+                .play-button {
+                    font-size: 8vw;        /* Fonte bem maior */
+                    padding: 3vw 6vw;      /* Padding maior para touch */
+                    border-radius: 2vw;    /* Bordas proporcionais */
+                }
+                
+                /* Imagem de fundo otimizada para celular */
+                .background-image {
+                    width: 90vw;           /* Usa mais largura da tela */
+                    height: 40vw;          /* Ajusta altura proporcionalmente */
+                }
+            }
 
-        function destravaAudio() {
-            bgMusic.play().then(() => {
-                document.removeEventListener('click', destravaAudio);
-                document.removeEventListener('keydown', destravaAudio);
-            }).catch(err => console.log("Bloqueado"));
-        }
+            body {
+                margin: 0;
+                height: 100vh;
+                background-color: #000;
+                font-family: 'Consolas', monospace;
+                /* Overflow hidden garante que nada crie barras de rolagem indesejadas */
+                overflow: hidden; 
+            }
 
-        document.addEventListener('click', destravaAudio);
-        document.addEventListener('keydown', destravaAudio);
+            .container-imagem {
+                /* --- CONTAINER CENTRALIZADO COM MARGENS --- */
+                
+                /* Posição fixa para centralizar */
+                position: fixed;
+                
+                /* Centraliza com margens iguais nos 4 cantos */
+                top: var(--spacing-vertical);
+                bottom: var(--spacing-vertical);
+                left: var(--spacing-vertical);
+                right: var(--spacing-vertical);
+                
+                /* Dimensões calculadas automaticamente */
+                width: calc(100vw - 2 * var(--spacing-vertical));
+                height: calc(100vh - 2 * var(--spacing-vertical));
+                
+                /* ------------------------- */
 
-        window.onload = function() {
-            bgMusic.play().catch(() => console.log("Autoplay bloqueado"));
+                box-sizing: border-box;
+                /* Remove a imagem de fundo para usar elemento interno */
+                background-color: #000;
+                
+                /* Remove padding */
+                padding: 0;
+                
+                border-radius: 1vw;
+                backdrop-filter: blur(0.5vw);
+                
+                /* Centraliza o GIF/Imagem interna */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+                z-index: 1;
+                
+                /* Permite scroll interno para a imagem */
+                overflow: hidden;
+            }
 
-            // O primeiro inicia aos 7 segundos
-            setTimeout(() => {
-                rodarCiclo();
-            }, 7000);
-        };
-    </script>
-</body>
-</html>
+            /* Imagem de fundo interna com margens */
+            .background-image {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                
+                width: 85vw;
+                height: 37vw;
+                
+                background-image: url('wew.jpg');
+                background-size: contain;
+                background-position: center center;
+                background-repeat: no-repeat;
+                
+                border-radius: 0.5vw;
+                z-index: 0;
+            }
+
+            #imagem-dinamica {
+                width: var(--media-size);
+                height: var(--media-size);
+                object-fit: contain;
+                
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                
+                border-radius: 0.8vw;
+                transition: opacity 0.5s ease;
+                opacity: 0;
+                z-index: 10;
+                cursor: grab;
+            }
+
+            #imagem-dinamica:active {
+                cursor: grabbing;
+            }
+
+            .botao-voltar {
+                position: fixed;
+                top: 1.5vw;
+                left: 1.5vw;
+                width: var(--back-btn-size);
+                height: var(--back-btn-size);
+                border-radius: 0.5vw;
+                border: 0.1vw solid rgba(255,255,255,0.2);
+                background: rgba(0,0,0,0.4);
+                color: rgba(255,255,255,0.8);
+                font-size: var(--back-btn-font);
+                cursor: pointer;
+                backdrop-filter: blur(0.4vw);
+                transition: all 0.2s ease;
+                z-index: 30;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+            }
+
+            .botao-voltar:hover {
+                background: rgba(0,0,0,0.6);
+                color: rgba(255,255,255,1);
+                transform: scale(1.1);
+            }
+
+            /* Botão PLAY central */
+            .play-button {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                
+                background: rgba(255, 255, 255, 0.9);
+                color: #000;
+                font-size: 4vw;
+                font-weight: bold;
+                padding: 2vw 4vw;
+                border: none;
+                border-radius: 1vw;
+                cursor: pointer;
+                z-index: 100;
+                
+                backdrop-filter: blur(0.5vw);
+                box-shadow: 0 0 2vw rgba(255, 255, 255, 0.5);
+                transition: all 0.3s ease;
+            }
+
+            .play-button:hover {
+                background: rgba(255, 255, 255, 1);
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+
+            /* Esconde o botão quando a música começa */
+            .play-button.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Container principal centralizado -->
+        <div class="container-imagem">
+            <!-- Imagem de fundo com margens -->
+            <div class="background-image"></div>
+            
+            <img id="imagem-dinamica" src="" alt="">
+            <a href="#" class="botao-voltar" title="Voltar">←</a>
+        </div>
+
+        <!-- Botão PLAY central -->
+        <button class="play-button" id="playButton">PLAY</button>
+
+        <audio id="meu-som"></audio>
+        <audio id="musica-fundo" src="ebony.mp3"></audio>
+        </div>
+
+        <div id="controls-info">
+            Arrastar: Mover<br>
+            Duplo-clique: Reset<br>
+            Tecla R: Reset
+        </div>
+
+        <script>
+            const imgElement = document.getElementById('imagem-dinamica');
+            const somElement = document.getElementById('meu-som');
+            const bgMusic = document.getElementById('musica-fundo');
+            const playButton = document.getElementById('playButton');
+            const container = document.querySelector('.container-imagem');
+
+            bgMusic.volume = 0.3;
+            somElement.volume = 1.0;
+
+            const duracaoGif = 5000; 
+
+            const playlist = [
+                { img: '5.png', som: '5.mp3' },
+                { img: 'patri.gif', som: 'patri.mp3' },
+                { img: '2.webp', som: '2.mp3' },
+                { img: 'joker.gif', som: 'joker.mp3' },
+                { img: '3.png', som: '3.mp3' },
+                { img: '4.png', som: '4.mp3' },
+                { img: '1.jpg', som: '1.mp3' },
+                { img: 'qww.gif', som: 'sil.mp3' }
+            ];
+
+            let index = 0;
+            let intervaloId; 
+
+            function rodarCiclo() {
+                imgElement.src = playlist[index].img;
+                somElement.src = playlist[index].som;
+                imgElement.style.opacity = 1;
+                somElement.play().catch(e => console.log("Erro play som fx"));
+
+                setTimeout(() => {
+                    imgElement.style.opacity = 0;
+                    somElement.pause();
+                    somElement.currentTime = 0;
+                }, duracaoGif);
+
+                index++;
+                if (index >= playlist.length) {
+                    clearInterval(intervaloId);
+                    setTimeout(() => {
+                        window.location.href = "fim.html";
+                    }, duracaoGif + 500);
+                }
+            }
+
+            function iniciarExperiencia() {
+                // Esconde o botão PLAY
+                playButton.classList.add('hidden');
+                
+                // Inicia a música de fundo
+                bgMusic.play().then(() => {
+                    console.log("Música iniciada");
+                }).catch(() => {
+                    console.log("Erro ao iniciar música");
+                });
+
+                // Inicia os GIFs após 1 segundo
+                setTimeout(() => {
+                    rodarCiclo();
+                    intervaloId = setInterval(rodarCiclo, 10000);
+                }, 1000);
+            }
+
+            // Event listener para o botão PLAY
+            playButton.addEventListener('click', iniciarExperiencia);
+
+            // --- LÓGICA DE DRAG AND DROP (Sem Zoom) ---
+            let posX = 50;
+            let posY = 50;
+            let isDragging = false;
+            let startX, startY;
+
+            function updateImageTransform() {
+                imgElement.style.left = posX + '%';
+                imgElement.style.top = posY + '%';
+                imgElement.style.transform = `translate(-50%, -50%)`;
+            }
+
+            function handleStart(clientX, clientY) {
+                isDragging = true;
+                startX = clientX;
+                startY = clientY;
+                imgElement.style.cursor = 'grabbing';
+            }
+
+            function handleMove(clientX, clientY) {
+                if (!isDragging) return;
+                
+                // Pega o tamanho real do container fixo
+                const rect = container.getBoundingClientRect();
+
+                // Calcula quanto moveu em porcentagem
+                const deltaX = (clientX - startX) / rect.width * 100;
+                const deltaY = (clientY - startY) / rect.height * 100;
+                
+                posX = posX + deltaX;
+                posY = posY + deltaY;
+                
+                startX = clientX;
+                startY = clientY;
+                
+                updateImageTransform();
+            }
+
+            function handleEnd() {
+                isDragging = false;
+                imgElement.style.cursor = 'grab';
+            }
+
+            // Mouse
+            imgElement.addEventListener('mousedown', e => { e.preventDefault(); handleStart(e.clientX, e.clientY); });
+            document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+            document.addEventListener('mouseup', handleEnd);
+
+            // Touch
+            imgElement.addEventListener('touchstart', e => { handleStart(e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+            document.addEventListener('touchmove', e => { 
+                handleMove(e.touches[0].clientX, e.touches[0].clientY); 
+                e.preventDefault(); 
+            }, {passive: false});
+            document.addEventListener('touchend', handleEnd);
+
+            imgElement.addEventListener('dblclick', () => { 
+                posX = 50; 
+                posY = 50; 
+                updateImageTransform(); 
+            });
+
+            // Reset posição com tecla R
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'r' || e.key === 'R') {
+                    posX = 50;
+                    posY = 50;
+                    updateImageTransform();
+                }
+            });
+        </script>
+    </body>
+    </html>

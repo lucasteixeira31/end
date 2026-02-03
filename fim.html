@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Background com Player</title>
     <style>
+        :root {
+            /* Responsivo invertido:
+               - tela pequena = maior
+               - tela grande  = menor
+            */
+            --play-btn-size: 120px;
+        }
+
+        @media (min-width: 480px) {
+            :root { --play-btn-size: 110px; }
+        }
+
+        @media (min-width: 768px) {
+            :root { --play-btn-size: 100px; }
+        }
+
+        @media (min-width: 1024px) {
+            :root { --play-btn-size: 92px; }
+        }
+
+        @media (min-width: 1440px) {
+            :root { --play-btn-size: 84px; }
+        }
+
         /* Reset básico */
         * {
             margin: 0;
@@ -41,8 +65,8 @@
 
         /* O BOTÃO CIRCULAR */
         .play-btn {
-            width: 100px;
-            height: 100px;
+            width: var(--play-btn-size);
+            height: var(--play-btn-size);
             background: rgba(255, 255, 255, 0.2); /* Fundo translúcido */
             backdrop-filter: blur(10px); /* Efeito de vidro */
             border: 2px solid white;

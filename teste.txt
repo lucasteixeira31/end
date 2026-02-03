@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Fullscreen Fixo</title>
+    <style>
+        :root {
+            /* Espaçamento vertical proporcional - simula ~15cm visuais */
+            --spacing-vertical: clamp(8vh, 12vh, 15vh);
+            
+            /* Tamanho dos elementos internos (GIF) - responsivo */
+            --media-size: 20vmin; 
+
+            /* Tamanho do botão proporcional */
+            --back-btn-size: 3vw;
+            --back-btn-font: 1.5vw;
+        }
+
+        /* Ajuste para celular */
+        @media (max-width: 768px) {
+            :root {
+                --media-size: 25vmin; 
+                --back-btn-size: 4vw;
+                --back-btn-font: 2vw;
+            }
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #000;
+            font-family: 'Consolas', monospace;
+            /* Overflow hidden garante que nada crie barras de rolagem indesejadas */
+            overflow: hidden; 
+        }
+
+        .container-imagem {
+            /* --- FIXAÇÃO COM BORDAS PROPORCIONAIS --- */
+            position: fixed;
+            
+            /* Trava o container com bordas proporcionais ao zoom */
+            top: var(--container-border);
+            bottom: var(--container-border);
+            left: var(--container-border);
+            right: var(--container-border);
+            
+            /* Garante que o container preencha o espaço definido acima */
+            width: calc(100vw - 2 * var(--container-border)); 
+            height: calc(100vh - 2 * var(--container-border));
+            
+            /* ------------------------- */
+
+            box-sizing: border-box;
+            background-image: url('wew.jpg');
+            
+            /* 'contain' garante que a imagem apareça completa sem cortes */
+            background-size: contain; 
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            border-radius: 1vw;
+            box-shadow: 0 0 0 100vmax #000; /* Truque visual: garante borda preta sólida fora do container */
+            backdrop-filter: blur(0.5vw);
+            
+            /* Centraliza o GIF/Imagem interna */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            z-index: 1;
+            
+            /* Permite zoom e scroll interno para a imagem */
+            overflow: hidden;
+        }
+
+        #imagem-dinamica {
+            width: var(--media-size);
+            height: var(--media-size);
+            object-fit: contain;
+            
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            border-radius: 0.8vw;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            z-index: 10;
+            cursor: grab;
+        }
+
+        #imagem-dinamica:active {
+            cursor: grabbing;
+        }
+
+        .botao-voltar {
+            position: absolute;
+            top: 1.5vw;
+            left: 1.5vw;
+            width: var(--back-btn-size);
+            height: var(--back-btn-size);
+            border-radius: 0.5vw;
+            border: 0.1vw solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.8);
+            font-size: var(--back-btn-font);
+            cursor: pointer;
+            backdrop-filter: blur(0.4vw);
+            transition: all 0.2s ease;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .botao-voltar:hover {
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,1);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-imagem">
+        <img id="imagem-dinamica" src="" alt="">
+        <a href="#" class="botao-voltar" title="Voltar">←</a>
+    </div>
+
+    <audio id="meu-som"></audio>
+    <audio id="musica-fundo" src="ebony.mp3"></audio>
+
+    <div id="status-audio" style="position: fixed; bottom: 0.7vw; right: 0.7vw; background: rgba(0,0,0,0.7); color: lime; padding: 0.3vw; font-size: 0.8vw; pointer-events: none; z-index: 9999; border-radius: 0.3vw;">
+        Aguardando...
+    </div>
+
+    <div id="controls-info" style="position: fixed; top: 0.7vw; right: 0.7vw; background: rgba(0,0,0,0.7); color: rgba(255,255,255,0.8); padding: 0.5vw; font-size: 0.7vw; pointer-events: none; z-index: 9999; border-radius: 0.3vw; text-align: right; line-height: 1.3;"></div>
+        Arrastar: Mover<br>
+        Duplo-clique: Reset<br>
+        Tecla R: Reset
+    </div>
+
+    <script>
+        const imgElement = document.getElementById('imagem-dinamica');
+        const somElement = document.getElementById('meu-som');
+        const bgMusic = document.getElementById('musica-fundo');
+        const statusDiv = document.getElementById('status-audio');
+        const container = document.querySelector('.container-imagem');
+
+        bgMusic.volume = 0.3;
+        somElement.volume = 1.0;
+
+        bgMusic.addEventListener('playing', () => {
+            statusDiv.textContent = "Tocando: track.mp3";
+            statusDiv.style.color = "lime";
+        });
+        
+        bgMusic.addEventListener('error', (e) => {
+             statusDiv.textContent = "Erro Audio";
+             statusDiv.style.color = "red";
+        });
+
+        const duracaoGif = 5000; 
+
+        const playlist = [
+            { img: '5.png', som: '5.mp3' },
+            { img: 'patri.gif', som: 'patri.mp3' },
+            { img: '2.webp', som: '2.mp3' },
+            { img: 'joker.gif', som: 'joker.mp3' },
+            { img: '3.png', som: '3.mp3' },
+            { img: '4.png', som: '4.mp3' },
+            { img: '1.jpg', som: '1.mp3' },
+            { img: 'qww.gif', som: 'sil.mp3' }
+        ];
+
+        let index = 0;
+        let intervaloId; 
+
+        function rodarCiclo() {
+            imgElement.src = playlist[index].img;
+            somElement.src = playlist[index].som;
+            imgElement.style.opacity = 1;
+            somElement.play().catch(e => console.log("Erro play som fx"));
+
+            setTimeout(() => {
+                imgElement.style.opacity = 0;
+                somElement.pause();
+                somElement.currentTime = 0;
+            }, duracaoGif);
+
+            index++;
+            if (index >= playlist.length) {
+                clearInterval(intervaloId);
+                setTimeout(() => {
+                    window.location.href = "fim.html";
+                }, duracaoGif + 500);
+            }
+        }
+
+        function iniciarExperiencia() {
+            statusDiv.textContent = "Carregando...";
+            bgMusic.play().then(() => {
+                console.log("Play OK");
+            }).catch(() => {
+                statusDiv.textContent = "Toque na tela";
+                statusDiv.style.color = "yellow";
+                document.addEventListener('click', forcarInicio);
+                document.addEventListener('touchstart', forcarInicio);
+                document.addEventListener('keydown', forcarInicio);
+            });
+
+            setTimeout(() => {
+                rodarCiclo();
+                intervaloId = setInterval(rodarCiclo, 10000);
+            }, 1000);
+        }
+
+        function forcarInicio() {
+            bgMusic.play();
+            document.removeEventListener('click', forcarInicio);
+            document.removeEventListener('touchstart', forcarInicio);
+            document.removeEventListener('keydown', forcarInicio);
+        }
+
+        window.addEventListener('load', iniciarExperiencia);
+
+        // --- LÓGICA DE DRAG AND DROP (Sem Zoom) ---
+        let posX = 50;
+        let posY = 50;
+        let isDragging = false;
+        let startX, startY;
+
+        function updateImageTransform() {
+            imgElement.style.left = posX + '%';
+            imgElement.style.top = posY + '%';
+            imgElement.style.transform = `translate(-50%, -50%)`;
+        }
+
+        function handleStart(clientX, clientY) {
+            isDragging = true;
+            startX = clientX;
+            startY = clientY;
+            imgElement.style.cursor = 'grabbing';
+        }
+
+        function handleMove(clientX, clientY) {
+            if (!isDragging) return;
+            
+            // Pega o tamanho real do container fixo
+            const rect = container.getBoundingClientRect();
+
+            // Calcula quanto moveu em porcentagem
+            const deltaX = (clientX - startX) / rect.width * 100;
+            const deltaY = (clientY - startY) / rect.height * 100;
+            
+            posX = posX + deltaX;
+            posY = posY + deltaY;
+            
+            startX = clientX;
+            startY = clientY;
+            
+            updateImageTransform();
+        }
+
+        function handleEnd() {
+            isDragging = false;
+            imgElement.style.cursor = 'grab';
+        }
+
+        // Mouse
+        imgElement.addEventListener('mousedown', e => { e.preventDefault(); handleStart(e.clientX, e.clientY); });
+        document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+        document.addEventListener('mouseup', handleEnd);
+
+        // Touch
+        imgElement.addEventListener('touchstart', e => { handleStart(e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+        document.addEventListener('touchmove', e => { 
+            handleMove(e.touches[0].clientX, e.touches[0].clientY); 
+            e.preventDefault(); 
+        }, {passive: false});
+        document.addEventListener('touchend', handleEnd);
+
+        imgElement.addEventListener('dblclick', () => { 
+            posX = 50; 
+            posY = 50; 
+            updateImageTransform(); 
+        });
+
+        // Reset posição com tecla R
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                posX = 50;
+                posY = 50;
+                updateImageTransform();
+            }
+        });
+    </script>
+</body>
+</html>
